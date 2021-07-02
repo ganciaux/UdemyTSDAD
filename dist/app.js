@@ -5,7 +5,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-//Project Type
+// Project Type
 var ProjectStatus;
 (function (ProjectStatus) {
     ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
@@ -28,7 +28,7 @@ class State {
         this.listeners.push(listenerFn);
     }
 }
-//Project state management
+// Project state management
 class ProjectState extends State {
     constructor() {
         super();
@@ -69,7 +69,7 @@ function validate(validatableInput) {
     }
     return isValid;
 }
-//autobind decorator
+// autobind decorator
 function autobind(target, methodName, descriptor) {
     const originalMethod = descriptor.value;
     //adjusted method
@@ -96,6 +96,23 @@ class Component {
     attach(insertAtBeginning) {
         this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
     }
+}
+// ProjectItem Class
+class ProjectItem extends Component {
+    constructor(hostId, project) {
+        super('single-project', hostId, false, project.id);
+        this.project = project;
+        this.configure();
+        this.renderContent();
+    }
+    configure() { }
+    ;
+    renderContent() {
+        this.element.querySelector('h2').textContent = this.project.title;
+        this.element.querySelector('h3').textContent = this.project.people.toString();
+        this.element.querySelector('p').textContent = this.project.description;
+    }
+    ;
 }
 // ProjectList Class
 class ProjectList extends Component {
@@ -127,9 +144,7 @@ class ProjectList extends Component {
         const listEl = document.getElementById(`${this.type}-projects-list`);
         listEl.innerHTML = '';
         for (const prjIItem of this.assignedProjects) {
-            const listItem = document.createElement('li');
-            listItem.textContent = prjIItem.title;
-            listEl.appendChild(listItem);
+            new ProjectItem(this.element.querySelector('ul').id, prjIItem);
         }
     }
 }
