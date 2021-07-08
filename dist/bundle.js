@@ -7,22 +7,62 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var App;
 (function (App) {
-    // Project Type
-    let ProjectStatus;
-    (function (ProjectStatus) {
-        ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
-        ProjectStatus[ProjectStatus["Finished"] = 1] = "Finished";
-    })(ProjectStatus = App.ProjectStatus || (App.ProjectStatus = {}));
-    class Project {
-        constructor(id, title, description, people, status) {
-            this.id = id;
-            this.title = title;
-            this.description = description;
-            this.people = people;
-            this.status = status;
+    // Compoment Base Class
+    class Component {
+        constructor(templateId, hostElementId, insertAtStart, newElementId) {
+            this.templateElement = document.getElementById(templateId);
+            this.hostElement = document.getElementById(hostElementId);
+            const importedElement = document.importNode(this.templateElement.content, true);
+            this.element = importedElement.firstElementChild;
+            if (newElementId)
+                this.element.id = newElementId;
+            this.attach(insertAtStart);
+        }
+        attach(insertAtBeginning) {
+            this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
         }
     }
-    App.Project = Project;
+    App.Component = Component;
+})(App || (App = {}));
+var App;
+(function (App) {
+    function validate(validatableInput) {
+        let isValid = true;
+        if (validatableInput.required) {
+            isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+        }
+        if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+            isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+        }
+        if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+            isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+        }
+        if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+            isValid = isValid && +validatableInput.value >= validatableInput.min;
+        }
+        if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+            isValid = isValid && +validatableInput.value <= validatableInput.max;
+        }
+        return isValid;
+    }
+    App.validate = validate;
+})(App || (App = {}));
+var App;
+(function (App) {
+    // autobind decorator
+    function autobind(target, methodName, descriptor) {
+        const originalMethod = descriptor.value;
+        //adjusted method
+        const adjDescriptor = {
+            configurable: true,
+            get() {
+                const boundFn = originalMethod.bind(this);
+                return boundFn;
+            }
+        };
+        return adjDescriptor;
+    }
+    App.autobind = autobind;
 })(App || (App = {}));
 var App;
 (function (App) {
@@ -69,66 +109,10 @@ var App;
     App.ProjectState = ProjectState;
     App.projectState = ProjectState.getInstance();
 })(App || (App = {}));
-var App;
-(function (App) {
-    function validate(validatableInput) {
-        let isValid = true;
-        if (validatableInput.required) {
-            isValid = isValid && validatableInput.value.toString().trim().length !== 0;
-        }
-        if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
-            isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
-        }
-        if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
-            isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
-        }
-        if (validatableInput.min != null && typeof validatableInput.value === 'number') {
-            isValid = isValid && +validatableInput.value >= validatableInput.min;
-        }
-        if (validatableInput.max != null && typeof validatableInput.value === 'number') {
-            isValid = isValid && +validatableInput.value <= validatableInput.max;
-        }
-        return isValid;
-    }
-    App.validate = validate;
-})(App || (App = {}));
-var App;
-(function (App) {
-    // autobind decorator
-    function autobind(target, methodName, descriptor) {
-        const originalMethod = descriptor.value;
-        //adjusted method
-        const adjDescriptor = {
-            configurable: true,
-            get() {
-                const boundFn = originalMethod.bind(this);
-                return boundFn;
-            }
-        };
-        return adjDescriptor;
-    }
-    App.autobind = autobind;
-})(App || (App = {}));
-var App;
-(function (App) {
-    // Compoment Base Class
-    class Component {
-        constructor(templateId, hostElementId, insertAtStart, newElementId) {
-            this.templateElement = document.getElementById(templateId);
-            this.hostElement = document.getElementById(hostElementId);
-            const importedElement = document.importNode(this.templateElement.content, true);
-            this.element = importedElement.firstElementChild;
-            if (newElementId)
-                this.element.id = newElementId;
-            this.attach(insertAtStart);
-        }
-        attach(insertAtBeginning) {
-            this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
-        }
-    }
-    App.Component = Component;
-})(App || (App = {}));
 /// <reference path="base-components.ts"/>
+/// <reference path="../util/validation.ts"/>
+/// <reference path="../decorators/autobind.ts"/>
+/// <reference path="../state/project-state.ts"/>
 var App;
 (function (App) {
     //ProjectInput Class
@@ -195,7 +179,30 @@ var App;
     ], ProjectInput.prototype, "submitHandler", null);
     App.ProjectInput = ProjectInput;
 })(App || (App = {}));
+var App;
+(function (App) {
+    // Project Type
+    let ProjectStatus;
+    (function (ProjectStatus) {
+        ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
+        ProjectStatus[ProjectStatus["Finished"] = 1] = "Finished";
+    })(ProjectStatus = App.ProjectStatus || (App.ProjectStatus = {}));
+    class Project {
+        constructor(id, title, description, people, status) {
+            this.id = id;
+            this.title = title;
+            this.description = description;
+            this.people = people;
+            this.status = status;
+        }
+    }
+    App.Project = Project;
+})(App || (App = {}));
 /// <reference path="base-components.ts"/>
+/// <reference path="../decorators/autobind.ts"/>
+/// <reference path="../state/project-state.ts"/>
+/// <reference path="../models/project.ts"/>
+/// <reference path="../models/drag-drop.ts"/>
 var App;
 (function (App) {
     // ProjectList Class
@@ -261,11 +268,6 @@ var App;
     ], ProjectList.prototype, "dragLeaveHandler", null);
     App.ProjectList = ProjectList;
 })(App || (App = {}));
-/// <reference path="models/drag-drop.ts"/>
-/// <reference path="models/project.ts"/>
-/// <reference path="state/project-state.ts"/>
-/// <reference path="util/validation.ts"/>
-/// <reference path="decorators/autobind.ts"/>
 /// <reference path="components/project-input.ts"/>
 /// <reference path="components/project-list.ts"/>
 var App;
@@ -275,6 +277,10 @@ var App;
     const finishedPrjList = new App.ProjectList('finished');
 })(App || (App = {}));
 /// <reference path="base-components.ts"/>
+/// <reference path="../decorators/autobind.ts"/>
+/// <reference path="../state/project-state.ts"/>
+/// <reference path="../models/project.ts"/>
+/// <reference path="../models/drag-drop.ts"/>
 var App;
 (function (App) {
     // ProjectItem Class
