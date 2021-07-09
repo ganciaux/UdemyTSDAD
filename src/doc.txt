@@ -1,0 +1,6 @@
+command line:
+    tsc -w
+
+append type="module" include js:
+    <script src="dist/app.js" defer></script>
+    <script type="module" src="dist/app.js" defer></script>
