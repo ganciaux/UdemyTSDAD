@@ -9,5 +9,5 @@ change lite server browser:
 bs-config.json
 
 webpack:
-npm install --save-dev webpack webpack-cli webpack-dev-server typescript ts-loader  
+npm install --save-dev webpack webpack-cli webpack-dev-server typescript ts-loader clean-webpack-plugin
 comment rootDir tsconfig when use webpack
