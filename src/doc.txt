@@ -4,3 +4,10 @@ command line:
 append type="module" include js:
     <script src="dist/app.js" defer></script>
     <script type="module" src="dist/app.js" defer></script>
+
+change lite server browser:
+bs-config.json
+
+webpack:
+npm install --save-dev webpack webpack-cli webpack-dev-server typescript ts-loader  
+comment rootDir tsconfig when use webpack
